@@ -4,10 +4,10 @@
     {
       "label": "Sync → Build → Run (x86_64)",
       "type": "shell",
-      "command": "scripts/sync.sh && scripts/build_remote.sh && scripts/run_remote.sh",
+      "command": "scripts/sync.sh && scripts/build.sh && scripts/run.sh",
       "options": {
         "shell": {
-          "executable": "/bin/zsh",
+          "executable": "/bin/bash",
           "args": [
             "-i",
             "-c"
