@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p build
-cd build
+cmake -S . -D -B build \
+  -DCMAKE_TOOLCHAIN_FILE=cmake/clang-toolchain.cmake \
+  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . -j"$(nproc)"
+cmake --build build -j"$(nproc)"
