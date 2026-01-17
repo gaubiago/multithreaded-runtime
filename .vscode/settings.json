@@ -1,3 +1,16 @@
 {
-  "C_Cpp.default.compilerPath": "/usr/bin/clang++"
+  "C_Cpp.default.compilerPath": "/usr/bin/clang++",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+  "C_Cpp.errorSquiggles": "enabled",
+  "C_Cpp.codeAnalysis.enabled": true,
+  "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+  "C_Cpp.codeAnalysis.clangTidy.args": [
+    "--config-file=${workspaceFolder}/.clang-tidy"
+  ],
+
+  "[cpp]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  }
 }
