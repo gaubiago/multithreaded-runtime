@@ -19,8 +19,10 @@ struct Task {
   std::chrono::steady_clock::time_point submit_time;
 
   Task(uint64_t id_, TaskFn fn_, uint32_t estimated_cost_ = 1)
-      : id(id_), fn(std::move(fn_)), estimated_cost(estimated_cost_),
+      : id(id_),
+        fn(std::move(fn_)),
+        estimated_cost(estimated_cost_),
         submit_time(std::chrono::steady_clock::now()) {}
 };
 
-} // namespace runtime
+}  // namespace runtime

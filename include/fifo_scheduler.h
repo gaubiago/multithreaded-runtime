@@ -1,26 +1,24 @@
 #pragma once
 
-#include <optional>
-
-#include "task.h"
+#include "./scheduler.h"
 
 namespace runtime {
 
-class Scheduler {
+class FifoScheduler : Scheduler {
  public:
-  Scheduler();
+  FifoScheduler();
 
-  virtual ~Scheduler();
+  ~FifoScheduler() override;
 
   // Submit a new task into the scheduler
-  virtual void enqueue(Task task) = 0;
+  void enqueue(Task task) override;
 
   // Attempt to get a task for execution
   // Returns empty if no task is available
-  virtual std::optional<Task> dequeue(uint32_t worker_id) = 0;
+  std::optional<Task> dequeue(uint32_t worker_id) override;
 
   // Number of pending tasks (approximate is acceptable)
-  virtual size_t size() const = 0;
+  size_t size() const override;
 };
 
 }  // namespace runtime

@@ -9,7 +9,7 @@
 namespace runtime {
 
 class ThreadPool {
-public:
+ public:
   ThreadPool(size_t num_workers, std::unique_ptr<Scheduler> scheduler);
 
   ~ThreadPool();
@@ -27,8 +27,8 @@ public:
   // Stop workers and wait for completion
   void shutdown();
 
-private:
-  void worker_loop(uint32_t worker_id);
+ private:
+  void workerLoop(uint32_t worker_id);
 
   size_t num_workers_;
   std::unique_ptr<Scheduler> scheduler_;
@@ -37,4 +37,4 @@ private:
   std::atomic<bool> running_;
 };
 
-} // namespace runtime
+}  // namespace runtime
