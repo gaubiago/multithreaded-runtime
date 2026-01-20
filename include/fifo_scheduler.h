@@ -1,10 +1,14 @@
 #pragma once
 
 #include "./scheduler.h"
+#include "./workload.h"
 
 namespace runtime {
 
 class FifoScheduler : Scheduler {
+ private:
+  Workload workload_;
+
  public:
   FifoScheduler();
 

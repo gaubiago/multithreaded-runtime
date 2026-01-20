@@ -1,0 +1,4 @@
+#pragma once
+
+#define WORKLOAD_SZ 25
+#define NUM_PARTITIONS 4
