@@ -2,14 +2,13 @@
 
 #include "../include/fifo_scheduler.h"
 #include "../include/scheduler.h"
+#include "../include/settings.h"
 #include "../include/workload.h"
 
 int main() {
-  auto *scheduler = new runtime::FifoScheduler{};
-  scheduler->enqueue(
-      runtime::Task(1, []() { std::cout << "Task A" << std::endl; }));
-  scheduler->dequeue(0);
-  delete scheduler;
-
+  runtime::Workload workload(WORKLOAD_SZ);
+  workload.print();
+  workload.partition(NUM_PARTITIONS);
+  workload.print_partitions();
   return 0;
 }

@@ -11,8 +11,6 @@ namespace runtime {
 
 class FifoScheduler : Scheduler {
  private:
-  Workload workload_;
-
   std::queue<Task> queue_;
   std::mutex q_mtx_;
   std::condition_variable q_cv_;

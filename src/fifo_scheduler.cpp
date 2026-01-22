@@ -3,19 +3,13 @@
 #include <iostream>
 #include <optional>
 
-#include "../include/settings.h"
 #include "../include/task.h"
 #include "../include/workload.h"
 
 namespace runtime {
 
-FifoScheduler::FifoScheduler()
-    : workload_(Workload(WORKLOAD_SZ)), terminate_(false) {
+FifoScheduler::FifoScheduler() : terminate_(false) {
   std::cout << "Constructing FIFO Scheduler..." << std::endl;
-
-  workload_.print();
-  workload_.partition(NUM_PARTITIONS);
-  workload_.print_partitions();
 }
 
 FifoScheduler::~FifoScheduler() {
