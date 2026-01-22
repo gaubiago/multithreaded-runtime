@@ -21,6 +21,8 @@ class Scheduler {
 
   // Number of pending tasks (approximate is acceptable)
   virtual size_t size() const = 0;
+
+  virtual void exit() = 0;
 };
 
 }  // namespace runtime

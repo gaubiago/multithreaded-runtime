@@ -9,12 +9,13 @@
 
 namespace runtime {
 
-FifoScheduler::FifoScheduler() : workload_(Workload(WORKLOAD_SZ)) {
-  std::cout << "START: Constructing FIFO Scheduler..." << std::endl;
+FifoScheduler::FifoScheduler()
+    : workload_(Workload(WORKLOAD_SZ)), terminate_(false) {
+  std::cout << "Constructing FIFO Scheduler..." << std::endl;
+
   workload_.print();
   workload_.partition(NUM_PARTITIONS);
   workload_.print_partitions();
-  std::cout << "END: Constructing FIFO Scheduler..." << std::endl;
 }
 
 FifoScheduler::~FifoScheduler() {
@@ -22,19 +23,41 @@ FifoScheduler::~FifoScheduler() {
 }
 
 void FifoScheduler::enqueue(Task task) {
-  std::cout << "Enqueuing:" << std::endl;
-  task.fn();
+  std::cout << "Enqueuing Task " << task.id << "..." << std::endl;
+
+  {
+    std::lock_guard lk(q_mtx_);
+    queue_.push(task);
+  }
+
+  q_cv_.notify_one();
 }
 
 std::optional<Task> FifoScheduler::dequeue(uint32_t worker_id) {
-  std::cout << "Dequeuing:" << std::endl;
-  Task task(1, [worker_id]() {
-    std::cout << "Task executed by Worker " << worker_id << std::endl;
-  });
-  task.fn();
-  return std::optional<Task>(task);
+  std::optional<Task> task;
+
+  {
+    std::unique_lock lk(q_mtx_);
+    q_cv_.wait(lk, [this]() { return (!queue_.empty() || terminate_); });
+
+    if (!terminate_) {
+      task = queue_.front();
+
+      std::cout << "Worker " << worker_id << " dequeuing Task " << task->id
+                << "..." << std::endl;
+
+      queue_.pop();
+    }
+  }
+
+  return task;
 }
 
-size_t FifoScheduler::size() const { return 0; }
+size_t FifoScheduler::size() const { return queue_.size(); }
+
+void FifoScheduler::exit() {
+  terminate_ = true;
+  q_cv_.notify_all();
+}
 
 }  // namespace runtime

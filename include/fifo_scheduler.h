@@ -1,5 +1,9 @@
 #pragma once
 
+#include <condition_variable>
+#include <mutex>
+#include <queue>
+
 #include "./scheduler.h"
 #include "./workload.h"
 
@@ -8,6 +12,12 @@ namespace runtime {
 class FifoScheduler : Scheduler {
  private:
   Workload workload_;
+
+  std::queue<Task> queue_;
+  std::mutex q_mtx_;
+  std::condition_variable q_cv_;
+
+  bool terminate_;
 
  public:
   FifoScheduler();
@@ -23,6 +33,8 @@ class FifoScheduler : Scheduler {
 
   // Number of pending tasks (approximate is acceptable)
   size_t size() const override;
+
+  void exit() override;
 };
 
 }  // namespace runtime
