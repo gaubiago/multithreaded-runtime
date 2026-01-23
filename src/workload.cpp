@@ -46,4 +46,10 @@ void Workload::print_partitions() {
   }
 }
 
+const uint64_t* Workload::get_list_ptr() const { return list_.data(); }
+
+const std::vector<Partition>& Workload::get_partitions() const {
+  return partitions_;
+}
+
 }  // namespace runtime
