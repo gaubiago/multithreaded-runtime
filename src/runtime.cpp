@@ -11,14 +11,18 @@ int main() {
   runtime::Workload workload(WORKLOAD_SZ);
   workload.print();
 
-  runtime::Processor processor(runtime::Processor::stl_sort);
+  runtime::Processor processor(runtime::Processor::stl_sort, workload);
   processor.partition(NUM_PARTITIONS);
   processor.print_partitions();
-  const uint64_t* p = workload.get_list_ptr();
-  for (const auto& partition : processor.get_partitions()) {
-    processor.sort(const_cast<uint64_t*>(p + partition.start),
-                   const_cast<uint64_t*>(p + partition.end + 1));
-  }
+
+  processor.sort_partition(processor.get_partitions()[0]);
+  processor.sort_partition(processor.get_partitions()[1]);
+
+  workload.print();
+
+  processor.merge_partitions(processor.get_partitions()[0],
+                             processor.get_partitions()[1]);
+
   workload.print();
 
   // auto* scheduler = new runtime::FifoScheduler();

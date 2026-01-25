@@ -1,5 +1,6 @@
 #include "../include/processor.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <iostream>
@@ -8,7 +9,8 @@
 
 namespace runtime {
 
-Processor::Processor(SortFunc sort_func) : sort_func_(std::move(sort_func)){};
+Processor::Processor(SortFunc sort_func, Workload& workload)
+    : sort_func_(std::move(sort_func)), workload_(workload){};
 
 void Processor::sort(uint64_t* start, uint64_t* end) { sort_func_(start, end); }
 
@@ -39,6 +41,48 @@ void Processor::print_partitions() {
 
 const std::vector<Partition>& Processor::get_partitions() const {
   return partitions_;
+}
+
+void Processor::sort_partition(const Partition& a) {
+  const uint64_t* ptr = workload_.get_current_list_ptr();
+
+  sort(const_cast<uint64_t*>(ptr + a.start),
+       const_cast<uint64_t*>(ptr + a.end + 1));
+}
+
+void Processor::merge_partitions(const Partition& a, const Partition& b) {
+  runtime::Workload::Pointer p;
+  p.cur = const_cast<uint64_t*>(workload_.get_current_list_ptr());
+  p.old = const_cast<uint64_t*>(workload_.get_stale_list_ptr());
+
+  uint64_t i = a.start;
+  uint64_t j = b.start;
+
+  uint64_t k = std::min(i, j);
+
+  while (i != a.end + 1 && j != b.end + 1) {
+    if (*(p.cur + j) <= *(p.cur + i)) {
+      *(p.old + k) = *(p.cur + j);
+      j++;
+    } else {
+      *(p.old + k) = *(p.cur + i);
+      i++;
+    }
+
+    k++;
+  }
+
+  while (i != a.end + 1) {
+    *(p.old + k) = *(p.cur + i);
+    i++;
+    k++;
+  }
+
+  while (j != b.end + 1) {
+    *(p.old + k) = *(p.cur + j);
+    j++;
+    k++;
+  }
 }
 
 };  // namespace runtime
