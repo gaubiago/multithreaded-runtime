@@ -17,7 +17,7 @@ int main() {
   const uint64_t* p = workload.get_list_ptr();
   for (const auto& partition : processor.get_partitions()) {
     processor.sort(const_cast<uint64_t*>(p + partition.start),
-                   const_cast<uint64_t*>(p + partition.end));
+                   const_cast<uint64_t*>(p + partition.end + 1));
   }
   workload.print();
 
