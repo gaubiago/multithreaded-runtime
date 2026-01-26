@@ -5,6 +5,8 @@
 
 namespace runtime {
 
+struct Partition;
+
 class Workload {
  private:
   struct List {
@@ -22,10 +24,10 @@ class Workload {
 
   explicit Workload(uint64_t sz);
   ~Workload() = default;
-  void print();
-  const uint64_t* get_current_list_ptr() const;
-  const uint64_t* get_stale_list_ptr() const;
-  void refresh_list_states();
+  void print(const std::vector<Partition>& partitions) const;
+  const uint64_t* get_current_ptr() const;
+  const uint64_t* get_stale_ptr() const;
+  void refresh_states();
 };
 
 }  // namespace runtime

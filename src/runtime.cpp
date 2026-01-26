@@ -9,21 +9,18 @@
 
 int main() {
   runtime::Workload workload(WORKLOAD_SZ);
-  workload.print();
+  runtime::Processor processor(workload);
 
-  runtime::Processor processor(runtime::Processor::stl_sort, workload);
+  workload.print(processor.get_partitions_info());
+  std::cout << std::endl;
+
   processor.partition(NUM_PARTITIONS);
-  processor.print_partitions();
 
-  processor.sort_partition(processor.get_partitions()[0]);
-  processor.sort_partition(processor.get_partitions()[1]);
+  processor.set_sort_algo(runtime::Processor::stl_sort);
 
-  workload.print();
-
-  processor.merge_partitions(processor.get_partitions()[0],
-                             processor.get_partitions()[1]);
-
-  workload.print();
+  while (processor.get_num_partitions() > 1) {
+    processor.sort_and_merge_partitions();
+  }
 
   // auto* scheduler = new runtime::FifoScheduler();
 

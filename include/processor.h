@@ -20,20 +20,32 @@ struct Partition {
 
 class Processor {
  private:
+  struct Partitions {
+    bool source_of_truth;
+    std::vector<Partition> content;
+  };
+
   SortFunc sort_func_;
   Workload& workload_;
-  std::vector<Partition> partitions_;
+  Partitions partitions_[2];
   void sort(uint64_t* start, uint64_t* end);
 
  public:
-  explicit Processor(SortFunc sort_func, Workload& workload);
+  explicit Processor(Workload& workload);
   ~Processor() = default;
   static void stl_sort(uint64_t* start, uint64_t* end);
+  void set_sort_algo(SortFunc sort_func);
+  const std::vector<Partition>& get_current_ptns_info() const;
+  const std::vector<Partition>& get_stale_ptns_info() const;
+  void refresh_states();
   void partition(uint32_t n);
-  void print_partitions();
-  const std::vector<Partition>& get_partitions() const;
+  void print_partitions() const;
+  const std::vector<Partition>& get_partitions_info() const;
+  uint64_t get_num_partitions() const;
   void sort_partition(const Partition& a);
   void merge_partitions(const Partition& a, const Partition& b);
+  void update_partitions_info();
+  void sort_and_merge_partitions();
 };
 
 }  // namespace runtime

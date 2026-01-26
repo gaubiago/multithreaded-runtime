@@ -5,6 +5,9 @@
 #include <iostream>
 #include <random>
 
+#include "../include/processor.h"
+#include "../include/settings.h"
+
 namespace runtime {
 
 Workload::Workload(uint64_t sz) {
@@ -23,39 +26,39 @@ Workload::Workload(uint64_t sz) {
   assert(list_[0].content.size() == sz && "Workload must be of size sz");
 }
 
-void Workload::print() {
-  uint64_t i = 0;
+void Workload::print(const std::vector<Partition>& partitions) const {
+  const uint64_t* p = get_current_ptr();
 
-  for (auto idx : {0, 1}) {
-    std::cout << idx << ": ";
+  for (const auto& ptn : partitions) {
+    std::cout << "[";
 
-    for (auto& el : list_[idx].content) {
-      // std::cout << "[" << i++ << "]:";
-      std::cout << el << "  ";
+    for (uint64_t i = ptn.start; i <= ptn.end; i++) {
+      std::cout << *(p + i) << (i != ptn.end ? "  " : "]  ");
     }
-
-    std::cout << std::endl;
   }
+
+  std::cout << std::endl;
 }
 
-const uint64_t* Workload::get_current_list_ptr() const {
+const uint64_t* Workload::get_current_ptr() const {
+  assert(list_[0].source_of_truth != list_[1].source_of_truth &&
+         "Workload: There must be only one single source of truth at a time");
+
   return list_[0].source_of_truth ? list_[0].content.data()
                                   : list_[1].content.data();
 }
 
-const uint64_t* Workload::get_stale_list_ptr() const {
+const uint64_t* Workload::get_stale_ptr() const {
+  assert(list_[0].source_of_truth != list_[1].source_of_truth &&
+         "Workload: There must be only one single source of truth at a time");
+
   return !list_[0].source_of_truth ? list_[0].content.data()
                                    : list_[1].content.data();
 }
 
-void Workload::refresh_list_states() {
-  if (list_[0].source_of_truth) {
-    list_[0].source_of_truth = false;
-    list_[1].source_of_truth = true;
-  } else {
-    list_[0].source_of_truth = true;
-    list_[1].source_of_truth = false;
-  }
+void Workload::refresh_states() {
+  list_[0].source_of_truth = !list_[0].source_of_truth;
+  list_[1].source_of_truth = !list_[1].source_of_truth;
 }
 
 }  // namespace runtime
