@@ -11,6 +11,7 @@ int main() {
   runtime::Workload workload(WORKLOAD_SZ);
   runtime::Processor processor(workload);
 
+  std::cout << "Workload:" << std::endl;
   workload.print(processor.get_partitions_info());
   std::cout << std::endl;
 
@@ -18,8 +19,10 @@ int main() {
 
   processor.set_sort_algo(runtime::Processor::stl_sort);
 
+  processor.sort();
+
   while (processor.get_num_partitions() > 1) {
-    processor.sort_and_merge_partitions();
+    processor.merge();
   }
 
   // auto* scheduler = new runtime::FifoScheduler();

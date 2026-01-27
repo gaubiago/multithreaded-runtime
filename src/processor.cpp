@@ -136,6 +136,16 @@ void Processor::merge_partitions(const Partition& a, const Partition& b) {
   }
 }
 
+void Processor::copy_left_over_partition(const Partition& a) {
+  runtime::Workload::Pointer p;
+  p.cur = const_cast<uint64_t*>(workload_.get_current_ptr());
+  p.old = const_cast<uint64_t*>(workload_.get_stale_ptr());
+
+  for (uint64_t i = a.start; i <= a.end; i++) {
+    *(p.old + i) = *(p.cur + i);
+  }
+}
+
 void Processor::update_partitions_info() {
   const auto& cur_ptns = get_current_ptns_info();
   auto& old_ptns = const_cast<std::vector<Partition>&>(get_stale_ptns_info());
@@ -155,7 +165,7 @@ void Processor::update_partitions_info() {
   refresh_states();
 }
 
-void Processor::sort_and_merge_partitions() {
+void Processor::sort() {
   auto& cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
   auto& old_ptns = const_cast<std::vector<Partition>&>(get_stale_ptns_info());
 
@@ -172,10 +182,20 @@ void Processor::sort_and_merge_partitions() {
   print_partitions();
   workload_.print(cur_ptns);
   std::cout << std::endl;
+}
+
+void Processor::merge() {
+  auto& cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
+  auto& old_ptns = const_cast<std::vector<Partition>&>(get_stale_ptns_info());
 
   for (uint64_t i = 0; i < get_num_partitions() / 2; i++) {
     merge_partitions(cur_ptns[2 * i], cur_ptns[2 * i + 1]);
   }
+
+  if (get_num_partitions() % 2 == 1) {
+    copy_left_over_partition(cur_ptns[cur_ptns.size() - 1]);
+  }
+
   workload_.refresh_states();
 
   std::cout << "Merged partitions:" << std::endl;
@@ -184,13 +204,6 @@ void Processor::sort_and_merge_partitions() {
   cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
   workload_.print(cur_ptns);
   std::cout << std::endl;
-
-  if (cur_ptns.size() == 1) {
-    std::cout << "Sorted workload:" << std::endl;
-    print_partitions();
-    workload_.print(cur_ptns);
-    std::cout << std::endl;
-  }
 }
 
 };  // namespace runtime
