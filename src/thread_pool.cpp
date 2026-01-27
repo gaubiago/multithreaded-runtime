@@ -26,7 +26,11 @@ void ThreadPool::workerLoop(uint32_t worker_id) {
   std::cout << "Worker " << worker_id << " entering pool..." << std::endl;
 
   while (running_.load()) {
-    scheduler_->dequeue(worker_id);
+    std::optional<Task> task = scheduler_->dequeue(worker_id);
+
+    if (task.has_value()) {
+      task->fn();
+    }
   }
 }
 

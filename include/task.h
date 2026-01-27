@@ -6,6 +6,8 @@
 
 namespace runtime {
 
+struct Partition;
+
 using TaskFn = std::function<void()>;
 
 struct Task {

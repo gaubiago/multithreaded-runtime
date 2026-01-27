@@ -167,7 +167,6 @@ void Processor::update_partitions_info() {
 
 void Processor::sort() {
   auto& cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
-  auto& old_ptns = const_cast<std::vector<Partition>&>(get_stale_ptns_info());
 
   std::cout << "Initial partitions:" << std::endl;
   print_partitions();

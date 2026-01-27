@@ -9,7 +9,7 @@
 
 namespace runtime {
 
-class FifoScheduler : Scheduler {
+class FifoScheduler : public Scheduler {
  private:
   std::queue<Task> queue_;
   std::mutex q_mtx_;
