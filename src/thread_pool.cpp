@@ -20,7 +20,10 @@ ThreadPool::~ThreadPool() {
 }
 
 // Submit a task to the runtime
-void ThreadPool::submit(Task task) { scheduler_->enqueue(std::move(task)); }
+void ThreadPool::submit(Task task) {
+  in_flight_.fetch_add(1, std::memory_order_relaxed);
+  scheduler_->enqueue(std::move(task));
+}
 
 void ThreadPool::workerLoop(uint32_t worker_id) {
   std::cout << "Worker " << worker_id << " entering pool..." << std::endl;
@@ -30,6 +33,11 @@ void ThreadPool::workerLoop(uint32_t worker_id) {
 
     if (task.has_value()) {
       task->fn();
+
+      if (in_flight_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
+        std::unique_lock lk(done_mtx_);
+        done_cv_.notify_one();
+      }
     }
   }
 }
@@ -43,6 +51,12 @@ void ThreadPool::start() {
   for (uint32_t i = 0; i < num_workers_; i++) {
     workers_.emplace_back(std::thread(&ThreadPool::workerLoop, this, i));
   }
+}
+
+void ThreadPool::wait() {
+  std::unique_lock lk(done_mtx_);
+  done_cv_.wait(
+      lk, [this]() { return in_flight_.load(std::memory_order_acquire) == 0; });
 }
 
 // Stop workers and wait for completion

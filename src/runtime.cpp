@@ -44,6 +44,8 @@ int main() {
     thread_pool.submit(task);
   }
 
+  thread_pool.wait();
+
   std::cout << "Sorted partitions:" << std::endl;
   processor.print_partitions();
   workload.print(cur_ptns);
@@ -73,6 +75,8 @@ int main() {
           (ptn_info[sz - 1].end - ptn_info[sz - 1].start) + 1);
       thread_pool.submit(task);
     }
+
+    thread_pool.wait();
 
     workload.refresh_states();
 

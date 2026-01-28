@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <cstdint>
 #include <thread>
 #include <vector>
 
@@ -24,6 +25,8 @@ class ThreadPool {
   // Start worker threads
   void start();
 
+  void wait();
+
   // Stop workers and wait for completion
   void shutdown();
 
@@ -35,6 +38,10 @@ class ThreadPool {
 
   std::vector<std::thread> workers_;
   std::atomic<bool> running_;
+
+  std::atomic<uint64_t> in_flight_{0};
+  std::mutex done_mtx_;
+  std::condition_variable done_cv_;
 };
 
 }  // namespace runtime
