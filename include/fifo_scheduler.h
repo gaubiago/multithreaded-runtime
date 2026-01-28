@@ -30,7 +30,7 @@ class FifoScheduler : public Scheduler {
   std::optional<Task> dequeue(uint32_t worker_id) override;
 
   // Number of pending tasks (approximate is acceptable)
-  size_t size() const override;
+  size_t size() override;
 
   void exit() override;
 };

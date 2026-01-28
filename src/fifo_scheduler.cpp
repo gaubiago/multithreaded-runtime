@@ -47,7 +47,10 @@ std::optional<Task> FifoScheduler::dequeue(uint32_t worker_id) {
   return task;
 }
 
-size_t FifoScheduler::size() const { return queue_.size(); }
+size_t FifoScheduler::size() {
+  std::lock_guard lk(q_mtx_);
+  return queue_.size();
+}
 
 void FifoScheduler::exit() {
   terminate_ = true;

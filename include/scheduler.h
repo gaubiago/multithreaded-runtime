@@ -20,7 +20,7 @@ class Scheduler {
   virtual std::optional<Task> dequeue(uint32_t worker_id) = 0;
 
   // Number of pending tasks (approximate is acceptable)
-  virtual size_t size() const = 0;
+  virtual size_t size() = 0;
 
   virtual void exit() = 0;
 };
