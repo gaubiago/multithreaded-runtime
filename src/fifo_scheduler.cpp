@@ -1,6 +1,7 @@
 #include "../include/fifo_scheduler.h"
 
 #include <iostream>
+#include <mutex>
 #include <optional>
 
 #include "../include/task.h"
@@ -30,18 +31,16 @@ void FifoScheduler::enqueue(Task task) {
 std::optional<Task> FifoScheduler::dequeue(uint32_t worker_id) {
   std::optional<Task> task;
 
-  {
-    std::unique_lock lk(q_mtx_);
-    q_cv_.wait(lk, [this]() { return (!queue_.empty() || terminate_); });
+  std::unique_lock lk(q_mtx_);
+  q_cv_.wait(lk, [this]() { return (!queue_.empty() || terminate_); });
 
-    if (!terminate_) {
-      task = queue_.front();
+  if (!terminate_) {
+    task = queue_.front();
 
-      std::cout << "Worker " << worker_id << " dequeuing Task " << task->id
-                << "..." << std::endl;
+    std::cout << "Worker " << worker_id << " dequeuing Task " << task->id
+              << "..." << std::endl;
 
-      queue_.pop();
-    }
+    queue_.pop();
   }
 
   return task;
