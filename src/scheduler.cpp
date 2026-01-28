@@ -2,14 +2,16 @@
 
 #include <iostream>
 
+#include "../include/debug.h"
+
 namespace runtime {
 
 Scheduler::Scheduler() {
-  std::cout << "Constructing Scheduler..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "Scheduler ctor");
 }
 
 Scheduler::~Scheduler() {
-  std::cout << "Destructing Scheduler..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "Scheduler dtor");
 }
 
 }  // namespace runtime

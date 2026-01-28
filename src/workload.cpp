@@ -5,6 +5,7 @@
 #include <iostream>
 #include <random>
 
+#include "../include/debug.h"
 #include "../include/processor.h"
 #include "../include/settings.h"
 
@@ -28,16 +29,17 @@ Workload::Workload(uint64_t sz) {
 
 void Workload::print(const std::vector<Partition>& partitions) const {
   const uint64_t* p = get_current_ptr();
+  std::string msg;
 
   for (const auto& ptn : partitions) {
-    std::cout << "[";
+    msg += "[";
 
     for (uint64_t i = ptn.start; i <= ptn.end; i++) {
-      std::cout << *(p + i) << (i != ptn.end ? "  " : "]  ");
+      msg += std::to_string(*(p + i)) + (i != ptn.end ? "  " : "]  ");
     }
   }
 
-  std::cout << std::endl;
+  runtime::debug::log(runtime::debug::kInfo, msg);
 }
 
 const uint64_t* Workload::get_current_ptr() const {

@@ -4,21 +4,22 @@
 #include <mutex>
 #include <optional>
 
+#include "../include/debug.h"
 #include "../include/task.h"
 #include "../include/workload.h"
 
 namespace runtime {
 
 FifoScheduler::FifoScheduler() : terminate_(false) {
-  std::cout << "Constructing FIFO Scheduler..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "FifoScheduler ctor");
 }
 
 FifoScheduler::~FifoScheduler() {
-  std::cout << "Destructing FIFO Scheduler..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "FifoScheduler dtor");
 }
 
 void FifoScheduler::enqueue(Task task) {
-  std::cout << "Enqueuing Task " << task.id << "..." << std::endl;
+  runtime::debug::log_task(task.id, runtime::debug::kDebug, "Enqueued");
 
   {
     std::lock_guard lk(q_mtx_);
@@ -37,8 +38,8 @@ std::optional<Task> FifoScheduler::dequeue(uint32_t worker_id) {
   if (!terminate_) {
     task = queue_.front();
 
-    std::cout << "Worker " << worker_id << " dequeuing Task " << task->id
-              << "..." << std::endl;
+    runtime::debug::log_worker(worker_id, runtime::debug::kDebug,
+                               "Dequeued Task " + std::to_string(task->id));
 
     queue_.pop();
   }

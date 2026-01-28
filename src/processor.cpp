@@ -7,12 +7,15 @@
 #include <iostream>
 #include <system_error>
 
+#include "../include/debug.h"
 #include "../include/settings.h"
-#include "workload.h"
+#include "../include/workload.h"
 
 namespace runtime {
 
 Processor::Processor(Workload& workload) : workload_(workload) {
+  runtime::debug::log(runtime::debug::kDebug, "Processor ctor");
+
   sort_func_ = nullptr;
 
   partitions_[0].source_of_truth = true;
@@ -21,6 +24,10 @@ Processor::Processor(Workload& workload) : workload_(workload) {
   partitions_[1].source_of_truth = false;
   partitions_[1].content = partitions_[0].content;
 };
+
+Processor::~Processor() {
+  runtime::debug::log(runtime::debug::kDebug, "Processor dtor");
+}
 
 void Processor::sort(uint64_t* start, uint64_t* end) { sort_func_(start, end); }
 
@@ -74,8 +81,10 @@ void Processor::print_partitions() const {
   const auto& partitions = get_current_ptns_info();
 
   for (uint32_t i = 0; i < partitions.size(); i++) {
-    std::cout << "p" << i << ": " << partitions.at(i).start << ".."
-              << partitions.at(i).end << std::endl;
+    runtime::debug::log(runtime::debug::kDebug,
+                        "p" + std::to_string(i) + ": " +
+                            std::to_string(partitions.at(i).start) + ".." +
+                            std::to_string(partitions.at(i).end));
   }
 }
 
@@ -168,19 +177,17 @@ void Processor::update_partitions_info() {
 void Processor::sort() {
   auto& cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
 
-  std::cout << "Initial partitions:" << std::endl;
+  runtime::debug::log(runtime::debug::kInfo, "Initial partitions:");
   print_partitions();
   workload_.print(cur_ptns);
-  std::cout << std::endl;
 
   for (const auto& ptn : cur_ptns) {
     sort_partition(ptn);
   }
 
-  std::cout << "Sorted partitions:" << std::endl;
+  runtime::debug::log(runtime::debug::kInfo, "Sorted partitions:");
   print_partitions();
   workload_.print(cur_ptns);
-  std::cout << std::endl;
 }
 
 void Processor::merge() {
@@ -197,12 +204,11 @@ void Processor::merge() {
 
   workload_.refresh_states();
 
-  std::cout << "Merged partitions:" << std::endl;
+  runtime::debug::log(runtime::debug::kInfo, "Merged partitions:");
   update_partitions_info();
   print_partitions();
   cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
   workload_.print(cur_ptns);
-  std::cout << std::endl;
 }
 
 };  // namespace runtime

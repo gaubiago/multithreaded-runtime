@@ -32,7 +32,7 @@ class Processor {
 
  public:
   explicit Processor(Workload& workload);
-  ~Processor() = default;
+  ~Processor();
   static void stl_sort(uint64_t* start, uint64_t* end);
   void set_sort_algo(SortFunc sort_func);
   const std::vector<Partition>& get_current_ptns_info() const;

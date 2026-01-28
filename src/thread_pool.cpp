@@ -4,6 +4,7 @@
 #include <iostream>
 #include <thread>
 
+#include "../include/debug.h"
 #include "../include/fifo_scheduler.h"
 
 namespace runtime {
@@ -12,11 +13,11 @@ ThreadPool::ThreadPool(size_t num_workers, std::unique_ptr<Scheduler> scheduler)
     : num_workers_(num_workers),
       scheduler_(std::move(scheduler)),
       running_(false) {
-  std::cout << "Constructing ThreadPool..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "ThreadPool ctor");
 }
 
 ThreadPool::~ThreadPool() {
-  std::cout << "Destructing ThreadPool..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "ThreadPool dtor");
 }
 
 // Submit a task to the runtime
@@ -26,7 +27,8 @@ void ThreadPool::submit(Task task) {
 }
 
 void ThreadPool::workerLoop(uint32_t worker_id) {
-  std::cout << "Worker " << worker_id << " entering pool..." << std::endl;
+  runtime::debug::log_worker(worker_id, runtime::debug::kDebug,
+                             "Entering worker pool");
 
   while (running_.load()) {
     std::optional<Task> task = scheduler_->dequeue(worker_id);
@@ -44,7 +46,7 @@ void ThreadPool::workerLoop(uint32_t worker_id) {
 
 // Start worker threads
 void ThreadPool::start() {
-  std::cout << "Starting the worker pool..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "Starting worker pool");
 
   running_.store(true);
 
@@ -61,7 +63,7 @@ void ThreadPool::wait() {
 
 // Stop workers and wait for completion
 void ThreadPool::shutdown() {
-  std::cout << "Shutting down the worker pool..." << std::endl;
+  runtime::debug::log(runtime::debug::kDebug, "Shutting down worker pool");
 
   running_.store(false);
 
@@ -71,7 +73,7 @@ void ThreadPool::shutdown() {
     auto& t = workers_[i];
 
     if (t.joinable()) {
-      std::cout << "Worker " << i << " exiting..." << std::endl;
+      runtime::debug::log_worker(i, runtime::debug::kDebug, "Exiting");
 
       t.join();
     }

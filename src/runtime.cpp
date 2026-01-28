@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <iostream>
 
+#include "../include/debug.h"
 #include "../include/fifo_scheduler.h"
 #include "../include/processor.h"
 #include "../include/scheduler.h"
@@ -10,12 +11,13 @@
 #include "thread_pool.h"
 
 int main() {
+  runtime::debug::min_level = runtime::debug::kInfo;
+
   runtime::Workload workload(WORKLOAD_SZ);
   runtime::Processor processor(workload);
 
-  std::cout << "Workload:" << std::endl;
+  runtime::debug::log(runtime::debug::kInfo, "Workload:");
   workload.print(processor.get_partitions_info());
-  std::cout << std::endl;
 
   processor.partition(NUM_PARTITIONS);
 
@@ -30,10 +32,10 @@ int main() {
       processor.get_current_ptns_info());
   auto& old_ptns = const_cast<std::vector<runtime::Partition>&>(
       processor.get_stale_ptns_info());
-  std::cout << "Initial partitions:" << std::endl;
+
+  runtime::debug::log(runtime::debug::kInfo, "Initial partitions:");
   processor.print_partitions();
   workload.print(cur_ptns);
-  std::cout << std::endl;
 
   std::vector<runtime::Partition> ptn_info = processor.get_partitions_info();
 
@@ -46,10 +48,9 @@ int main() {
 
   thread_pool.wait();
 
-  std::cout << "Sorted partitions:" << std::endl;
+  runtime::debug::log(runtime::debug::kInfo, "Sorted partitions");
   processor.print_partitions();
   workload.print(cur_ptns);
-  std::cout << std::endl;
 
   while (processor.get_num_partitions() > 1) {
     cur_ptns = const_cast<std::vector<runtime::Partition>&>(
@@ -80,13 +81,12 @@ int main() {
 
     workload.refresh_states();
 
-    std::cout << "Merged partitions:" << std::endl;
+    runtime::debug::log(runtime::debug::kInfo, "Merged partitions:");
     processor.update_partitions_info();
     processor.print_partitions();
     cur_ptns = const_cast<std::vector<runtime::Partition>&>(
         processor.get_current_ptns_info());
     workload.print(cur_ptns);
-    std::cout << std::endl;
   }
 
   thread_pool.shutdown();
