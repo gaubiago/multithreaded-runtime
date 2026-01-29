@@ -43,10 +43,12 @@ class Processor {
   const std::vector<Partition>& get_partitions_info() const;
   uint64_t get_num_partitions() const;
   void sort_partition(const Partition& a);
-  void sort();
   void merge_partitions(const Partition& a, const Partition& b);
   void copy_left_over_partition(const Partition& a);
   void update_partitions_info();
+
+  // Single-threaded only
+  void sort();
   void merge();
 };
 
