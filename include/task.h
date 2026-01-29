@@ -22,11 +22,7 @@ struct Task {
 
   static uint64_t next_id_;
 
-  Task(TaskFn fn_, uint32_t estimated_cost_ = 1)
-      : id(next_id_++),
-        fn(std::move(fn_)),
-        estimated_cost(estimated_cost_),
-        submit_time(std::chrono::steady_clock::now()) {}
+  explicit Task(TaskFn fn_, uint32_t estimated_cost_ = 1);
 };
 
 }  // namespace runtime
