@@ -24,6 +24,8 @@ Workload::Workload(uint64_t sz) {
 
   list_[1].content = list_[0].content;
 
+  duplicate_ = list_[0].content;
+
   assert(list_[0].content.size() == sz && "Workload must be of size sz");
 }
 
@@ -62,5 +64,7 @@ void Workload::refresh_states() {
   list_[0].source_of_truth = !list_[0].source_of_truth;
   list_[1].source_of_truth = !list_[1].source_of_truth;
 }
+
+std::vector<uint64_t> Workload::get_duplicate() const { return duplicate_; }
 
 }  // namespace runtime

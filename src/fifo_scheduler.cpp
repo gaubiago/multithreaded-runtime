@@ -5,21 +5,28 @@
 #include <optional>
 
 #include "../include/debug.h"
+#include "../include/settings.h"
 #include "../include/task.h"
 #include "../include/workload.h"
 
 namespace runtime {
 
 FifoScheduler::FifoScheduler() : terminate_(false) {
+#if LOG
   runtime::debug::log(runtime::debug::kDebug, "FifoScheduler ctor");
+#endif
 }
 
 FifoScheduler::~FifoScheduler() {
+#if LOG
   runtime::debug::log(runtime::debug::kDebug, "FifoScheduler dtor");
+#endif
 }
 
 void FifoScheduler::enqueue(Task task) {
+#if LOG
   runtime::debug::log_task(task.id, runtime::debug::kDebug, "Enqueued");
+#endif
 
   {
     std::lock_guard lk(q_mtx_);
@@ -38,8 +45,10 @@ std::optional<Task> FifoScheduler::dequeue(uint32_t worker_id) {
   if (!terminate_) {
     task = queue_.front();
 
+#if LOG
     runtime::debug::log_worker(worker_id, runtime::debug::kDebug,
                                "Dequeued Task " + std::to_string(task->id));
+#endif
 
     queue_.pop();
   }

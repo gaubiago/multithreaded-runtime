@@ -14,7 +14,9 @@
 namespace runtime {
 
 Processor::Processor(Workload& workload) : workload_(workload) {
+#if LOG
   runtime::debug::log(runtime::debug::kDebug, "Processor ctor");
+#endif
 
   sort_func_ = nullptr;
 
@@ -26,7 +28,9 @@ Processor::Processor(Workload& workload) : workload_(workload) {
 };
 
 Processor::~Processor() {
+#if LOG
   runtime::debug::log(runtime::debug::kDebug, "Processor dtor");
+#endif
 }
 
 void Processor::sort(uint64_t* start, uint64_t* end) { sort_func_(start, end); }
@@ -177,17 +181,21 @@ void Processor::update_partitions_info() {
 void Processor::sort() {
   auto& cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
 
+#if LOG
   runtime::debug::log(runtime::debug::kInfo, "Initial partitions:");
   print_partitions();
   workload_.print(cur_ptns);
+#endif
 
   for (const auto& ptn : cur_ptns) {
     sort_partition(ptn);
   }
 
+#if LOG
   runtime::debug::log(runtime::debug::kInfo, "Sorted partitions:");
   print_partitions();
   workload_.print(cur_ptns);
+#endif
 }
 
 void Processor::merge() {
@@ -203,12 +211,14 @@ void Processor::merge() {
   }
 
   workload_.refresh_states();
-
-  runtime::debug::log(runtime::debug::kInfo, "Merged partitions:");
   update_partitions_info();
+
+#if LOG
+  runtime::debug::log(runtime::debug::kInfo, "Merged partitions:");
   print_partitions();
   cur_ptns = const_cast<std::vector<Partition>&>(get_current_ptns_info());
   workload_.print(cur_ptns);
+#endif
 }
 
 };  // namespace runtime
