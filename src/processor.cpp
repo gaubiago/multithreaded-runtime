@@ -221,4 +221,15 @@ void Processor::merge() {
 #endif
 }
 
+void Processor::validate_sorting(const std::vector<uint64_t>& list) {
+  for (uint64_t i = 0; i < list.size() - 1; i++) {
+    if (list[i] > list[i + 1]) {
+      throw std::logic_error(
+          "Processor::validate_sorting(): list is not sorted correctly. ");
+    }
+  }
+
+  std::cout << "Workload sorted correctly" << std::endl;
+}
+
 };  // namespace runtime

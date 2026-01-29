@@ -46,6 +46,7 @@ class Processor {
   void merge_partitions(const Partition& a, const Partition& b);
   void copy_left_over_partition(const Partition& a);
   void update_partitions_info();
+  static void validate_sorting(const std::vector<uint64_t>& sorted_list);
 
   // Single-threaded only
   void sort();

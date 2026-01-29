@@ -102,15 +102,21 @@ int main() {
 
   std::cout << "Multi-threaded execution time: " << duration.count() << " ns"
             << std::endl;
+  std::cout << "Multi-thread: ";
+  std::vector<uint64_t> list(workload.get_current_ptr(),
+                             workload.get_current_ptr() + WORKLOAD_SZ);
+  runtime::Processor::validate_sorting(list);
 
   start = std::chrono::high_resolution_clock::now();
   std::vector<uint64_t> dup_workload = workload.get_duplicate();
-  std::sort(dup_workload.end(), dup_workload.end());
+  std::sort(dup_workload.begin(), dup_workload.end());
   end = std::chrono::high_resolution_clock::now();
   duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
 
   std::cout << "Single-threaded execution time: " << duration.count() << " ns"
             << std::endl;
+  std::cout << "Single-thread: ";
+  runtime::Processor::validate_sorting(dup_workload);
 
   return 0;
 }
