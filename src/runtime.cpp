@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cstdint>
 #include <iostream>
 
@@ -7,11 +8,11 @@
 #include "../include/scheduler.h"
 #include "../include/settings.h"
 #include "../include/task.h"
+#include "../include/thread_pool.h"
 #include "../include/workload.h"
-#include "thread_pool.h"
 
 int main() {
-  runtime::debug::min_level = runtime::debug::kDebug;
+  auto start = std::chrono::high_resolution_clock::now();
 
   runtime::Workload workload(WORKLOAD_SZ);
   runtime::Processor processor(workload);
@@ -94,6 +95,22 @@ int main() {
   }
 
   thread_pool.shutdown();
+
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+  std::cout << "Multi-threaded execution time: " << duration.count() << " ns"
+            << std::endl;
+
+  start = std::chrono::high_resolution_clock::now();
+  std::vector<uint64_t> dup_workload = workload.get_duplicate();
+  std::sort(dup_workload.end(), dup_workload.end());
+  end = std::chrono::high_resolution_clock::now();
+  duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+
+  std::cout << "Single-threaded execution time: " << duration.count() << " ns"
+            << std::endl;
 
   return 0;
 }

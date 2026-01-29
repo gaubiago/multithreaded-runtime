@@ -15,6 +15,7 @@ class Workload {
   };
 
   List list_[2];
+  std::vector<uint64_t> duplicate_;
 
  public:
   struct Pointer {
@@ -28,6 +29,7 @@ class Workload {
   const uint64_t* get_current_ptr() const;
   const uint64_t* get_stale_ptr() const;
   void refresh_states();
+  std::vector<uint64_t> get_duplicate() const;
 };
 
 }  // namespace runtime
