@@ -11,7 +11,7 @@
 #include "thread_pool.h"
 
 int main() {
-  runtime::debug::min_level = runtime::debug::kInfo;
+  runtime::debug::min_level = runtime::debug::kDebug;
 
   runtime::Workload workload(WORKLOAD_SZ);
   runtime::Processor processor(workload);
@@ -37,12 +37,11 @@ int main() {
   processor.print_partitions();
   workload.print(cur_ptns);
 
-  std::vector<runtime::Partition> ptn_info = processor.get_partitions_info();
+  std::vector<runtime::Partition> ptns_info = processor.get_partitions_info();
 
-  for (uint64_t i = 0; i < ptn_info.size(); i++) {
-    runtime::Task task(
-        i, [&, ptn_info = ptn_info[i]] { processor.sort_partition(ptn_info); },
-        (ptn_info[i].end - ptn_info[i].start) + 1);
+  for (const auto& ptn_info : ptns_info) {
+    runtime::Task task([&] { processor.sort_partition(ptn_info); },
+                       (ptn_info.end - ptn_info.start) + 1);
     thread_pool.submit(task);
   }
 
@@ -60,20 +59,18 @@ int main() {
 
     for (uint64_t i = 0; i < processor.get_num_partitions() / 2; i++) {
       runtime::Task task(
-          i,
           [&, a = cur_ptns[2 * i], b = cur_ptns[2 * i + 1]] {
             processor.merge_partitions(a, b);
           },
-          (ptn_info[2 * i + 1].end - ptn_info[2 * i].start) + 1);
+          (ptns_info[2 * i + 1].end - ptns_info[2 * i].start) + 1);
       thread_pool.submit(task);
     }
 
     if (processor.get_num_partitions() % 2 == 1) {
       uint64_t sz = cur_ptns.size();
       runtime::Task task(
-          sz - 1,
           [&, a = cur_ptns[sz - 1]] { processor.copy_left_over_partition(a); },
-          (ptn_info[sz - 1].end - ptn_info[sz - 1].start) + 1);
+          (ptns_info[sz - 1].end - ptns_info[sz - 1].start) + 1);
       thread_pool.submit(task);
     }
 
